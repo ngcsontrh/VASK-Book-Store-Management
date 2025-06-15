@@ -35,9 +35,7 @@ export default function Footer() {
               Địa chỉ
             </Typography>
             <Typography variant="body2">
-              123 Đường ABC, Quận XYZ
-              <br />
-              Thành phố HCM, Việt Nam
+              29 Chùa Bộc, Đống Đa, Hà Nội
             </Typography>
           </Box>
 
@@ -51,6 +49,9 @@ export default function Footer() {
               </ListItem>
               <ListItem disableGutters>
                 <ListItemText primary="Thuê sách" />
+              </ListItem>
+              <ListItem disableGutters>
+                <ListItemText primary="Chăm sóc khách hàng" />
               </ListItem>
             </List>
           </Box>
@@ -80,21 +81,12 @@ export default function Footer() {
               <ListItem disableGutters>
                 <ListItemText primary="Instagram" />
               </ListItem>
+              <ListItem disableGutters>
+                <ListItemText primary="SĐT: 0123456789" />
+              </ListItem>
             </List>
           </Box>
         </Stack>
-
-        <Box
-          sx={{
-            py: 2,
-            textAlign: "center",
-            bgcolor: theme.palette.grey[100],
-          }}
-        >
-          <Typography variant="body2" color="text.secondary">
-            © {new Date().getFullYear()} VASK Book Store
-          </Typography>
-        </Box>
       </Container>
     </Box>
   );

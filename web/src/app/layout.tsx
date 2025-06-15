@@ -6,6 +6,7 @@ import ThemeRegistry from "~/ThemeRegistry";
 import Footer from "~/components/layout/Footer";
 import Header from "~/components/layout/Header";
 import Sidebar from "~/components/layout/Sidebar";
+import { CartProvider } from "~/context/CartContext";
 
 export const metadata: Metadata = {
   title: "VASK",
@@ -24,46 +25,47 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body>
         <ThemeRegistry>
-          <Box sx={{ display: "flex", minHeight: "100vh" }}>
-            {/* Sidebar - fixed position */}
-            <Box
-              component="nav"
-              sx={{
-                width: { sm: drawerWidth },
-                flexShrink: { sm: 0 },
-              }}
-              aria-label="navigation menu"
-            >
-              <Sidebar />
-            </Box>
-
-            {/* Main Content - flexes to fill remaining space */}
-            <Box
-              component="main"
-              sx={{
-                flexGrow: 1,
-                display: "flex",
-                flexDirection: "column",
-                minHeight: "100vh",
-                width: { sm: `calc(100% - ${drawerWidth}px)` },
-              }}
-            >
-              <Header />
-              <Toolbar />{" "}
-              {/* This empty Toolbar adds spacing equal to the AppBar height */}
-              {/* Page Content - flexes to fill available space */}
+          <CartProvider>
+            <Box sx={{ display: "flex", minHeight: "100vh" }}>
+              {/* Sidebar - responsive */}
               <Box
+                component="nav"
+                sx={{
+                  width: { xs: 0, sm: drawerWidth },
+                  flexShrink: { sm: 0 },
+                }}
+                aria-label="navigation menu"
+              >
+                <Sidebar />
+              </Box>
+
+              {/* Main Content - flexes to fill remaining space */}
+              <Box
+                component="main"
                 sx={{
                   flexGrow: 1,
-                  p: 3,
+                  display: "flex",
+                  flexDirection: "column",
+                  minHeight: "100vh",
+                  width: { xs: "100%", sm: `calc(100% - ${drawerWidth}px)` },
                 }}
               >
-                {children}
+                <Header drawerWidth={drawerWidth} />
+                <Toolbar />
+                {/* Page Content - flexes to fill available space */}
+                <Box
+                  sx={{
+                    flexGrow: 1,
+                    p: { xs: 2, sm: 3 },
+                  }}
+                >
+                  {children}
+                </Box>
+                {/* Footer - stays at the bottom */}
+                <Footer />
               </Box>
-              {/* Footer - stays at the bottom */}
-              <Footer />
             </Box>
-          </Box>
+          </CartProvider>
         </ThemeRegistry>
       </body>
     </html>
