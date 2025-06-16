@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import NextLink from "next/link";
 import type { Book } from "~/models/Book.model";
-import { useCartStore } from "../../stores/cartStore";
+import { useCartStore } from "~/stores/cartStore";
 
 interface BookCardProps {
   book: Book;

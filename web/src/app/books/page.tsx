@@ -14,9 +14,9 @@ import {
 import MuiLink from "@mui/material/Link";
 import NextLink from "next/link";
 import { useState } from "react";
-import { BookCard } from "../../components/books/BookCard";
-import { BookFilter } from "../../components/books/BookFilter";
-import { type Book, booksData } from "../../models/Book.model";
+import { BookCard } from "~/components/books/BookCard";
+import { BookFilter } from "~/components/books/BookFilter";
+import { type Book, booksData } from "~/models/Book.model";
 
 export const Metadata = {
   title: "Danh sách sách | VASK Book Store",
