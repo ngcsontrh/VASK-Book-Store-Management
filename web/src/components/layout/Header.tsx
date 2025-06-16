@@ -1,26 +1,27 @@
 "use client";
 
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import MenuIcon from "@mui/icons-material/Menu";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import SearchIcon from "@mui/icons-material/Search";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import {
   AppBar,
   Avatar,
   Badge,
   Box,
   IconButton,
+  InputAdornment,
+  Popover,
   TextField,
   Toolbar,
   Typography,
-  useTheme,
   useMediaQuery,
-  InputAdornment,
-  Popover,
+  useTheme,
 } from "@mui/material";
 import NextLink from "next/link";
-import { useCart } from "~/context/CartContext";
 import { useState } from "react";
+import { useCartStore } from "~/stores/cartStore";
 
 interface HeaderProps {
   drawerWidth?: number;
@@ -30,7 +31,7 @@ export default function Header({ drawerWidth = 240 }: HeaderProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isMedium = useMediaQuery(theme.breakpoints.down("md"));
-  const { getCartItemsCount } = useCart();
+  const getCartItemsCount = useCartStore((state) => state.cartItems.length);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -175,8 +176,14 @@ export default function Header({ drawerWidth = 240 }: HeaderProps) {
             }}
           >
             <IconButton component={NextLink} href="/cart">
-              <Badge badgeContent={getCartItemsCount()} color="primary">
+              <Badge badgeContent={getCartItemsCount} color="primary">
                 <ShoppingCartIcon fontSize={isMobile ? "medium" : "large"} />
+              </Badge>
+            </IconButton>
+
+            <IconButton component={NextLink} href="/orders">
+              <Badge color="primary">
+                <ReceiptLongIcon fontSize={isMobile ? "medium" : "large"} />
               </Badge>
             </IconButton>
 

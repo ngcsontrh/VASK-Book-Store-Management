@@ -14,9 +14,15 @@ import {
 import MuiLink from "@mui/material/Link";
 import NextLink from "next/link";
 import { useState } from "react";
-import { BookCard } from "../../components/Books/BookCard";
-import { BookFilter } from "../../components/Books/BookFilter";
+import { BookCard } from "../../components/books/BookCard";
+import { BookFilter } from "../../components/books/BookFilter";
 import { type Book, booksData } from "../../models/Book.model";
+
+export const Metadata = {
+  title: "Danh sách sách | VASK Book Store",
+  description:
+    "Khám phá bộ sưu tập sách đa dạng tại VASK Book Store, nơi bạn có thể tìm thấy những cuốn sách yêu thích nhất.",
+};
 
 export default function BooksPage() {
   const [filteredBooks, setFilteredBooks] = useState(booksData);
@@ -145,7 +151,11 @@ export default function BooksPage() {
           >
             {currentBooks.map((book) => (
               <Box key={book.id}>
-                <BookCard book={book} onAddToCart={handleAddToCart} />
+                <BookCard
+                  book={book}
+                  onAddToCart={handleAddToCart}
+                  isDisplayAddToCart={true}
+                />
               </Box>
             ))}
           </Box>

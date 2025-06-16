@@ -1,8 +1,8 @@
 "use client";
 
+import { Home } from "@mui/icons-material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import { Home } from "@mui/icons-material";
 import {
   Alert,
   Box,
@@ -13,7 +13,6 @@ import {
   Chip,
   Container,
   Divider,
-  Grid,
   Rating,
   Snackbar,
   Typography,
@@ -22,13 +21,13 @@ import MuiLink from "@mui/material/Link";
 import NextLink from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { useCart } from "~/context/CartContext";
 import { booksData } from "~/models/Book.model";
+import { useCartStore } from "~/stores/cartStore";
 
 export default function BookDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { addToCart } = useCart();
+  const addToCart = useCartStore((state) => state.addToCart);
   const bookId = params.id as string;
 
   // Tìm thông tin sách dựa trên id
@@ -114,10 +113,16 @@ export default function BookDetailPage() {
           </MuiLink>
           <Typography color="text.primary">{book.title}</Typography>
         </Breadcrumbs>
-      </Box>      
-      
+      </Box>
+
       {/* Chi tiết sách */}
-      <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 4 }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          gap: 4,
+        }}
+      >
         {/* Hình ảnh sách */}
         <Box sx={{ flex: { xs: "1 1 100%", md: "0 0 33%" } }}>
           <Card

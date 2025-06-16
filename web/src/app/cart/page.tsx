@@ -1,39 +1,12 @@
-"use client";
+import type { Metadata } from "next";
+import CartContainer from "~/components/cart/CartContainer";
 
-import { Home } from "@mui/icons-material";
-import { Box, Breadcrumbs, Container } from "@mui/material";
-import MuiLink from "@mui/material/Link";
-import NextLink from "next/link";
+export const metadata: Metadata = {
+  title: "Giỏ hàng | VASK Book Store",
+  description:
+    "Giỏ hàng của bạn tại VASK Book Store, nơi mua sắm sách trực tuyến hàng đầu Việt Nam",
+};
 
 export default function CartPage() {
-  return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      {/* Breadcrumbs */}
-      <Box
-        sx={{
-          borderTop: "1px solid",
-          borderColor: "divider",
-          borderBottom: "1px solid",
-          borderBottomColor: "divider",
-          paddingY: 1,
-        }}
-      >
-        <Breadcrumbs sx={{ display: "flex", alignItems: "center" }}>
-          <Box display="flex " alignItems="center">
-            <Home fontSize="small" />
-          </Box>
-          <Box display="flex " alignItems="center">
-            <MuiLink
-              component={NextLink}
-              href="/cart"
-              underline="hover"
-              color="inherit"
-            >
-              Giỏ hàng
-            </MuiLink>
-          </Box>
-        </Breadcrumbs>
-      </Box>
-    </Container>
-  );
+  return <CartContainer />;
 }

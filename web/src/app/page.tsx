@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import NextImage from "next/image";
 import NextLink from "next/link";
-import { BookCard } from "../components/Books/BookCard";
+import { BookCard } from "../components/books/BookCard";
 import { booksData } from "../models/Book.model";
 
 export default function Page() {

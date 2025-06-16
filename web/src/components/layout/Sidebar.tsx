@@ -1,6 +1,7 @@
 "use client";
 
 import BarChartIcon from "@mui/icons-material/BarChart";
+import CloseIcon from "@mui/icons-material/Close";
 import HelpIcon from "@mui/icons-material/Help";
 import HomeIcon from "@mui/icons-material/Home";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -9,23 +10,22 @@ import PeopleIcon from "@mui/icons-material/People";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
   Divider,
   Drawer,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   Typography,
-  useTheme,
   useMediaQuery,
-  IconButton,
+  useTheme,
 } from "@mui/material";
-import Link from "next/link";
 import NextImage from "next/image";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -57,7 +57,7 @@ export default function Sidebar() {
 
   const mainMenu = [
     { label: "Trang chủ", path: "/", icon: <HomeIcon /> },
-    { label: "Kho sách", path: "/books", icon: <MenuBookIcon /> },
+    { label: "Kho sách", path: "/storage", icon: <MenuBookIcon /> },
     { label: "Giỏ hàng", path: "/cart", icon: <ShoppingCartIcon /> },
     { label: "Khách hàng", path: "/customers", icon: <PeopleIcon /> },
     { label: "Báo cáo", path: "/reports", icon: <BarChartIcon /> },
@@ -79,7 +79,7 @@ export default function Sidebar() {
             height: 70,
             display: "flex",
             alignItems: "center",
-            justifyContent: 'center',
+            justifyContent: "center",
             px: 2,
           }}
         >

@@ -12,20 +12,26 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { useCart } from "~/context/CartContext";
-import type { Book } from "~/models/Book.model";
 import NextLink from "next/link";
+import type { Book } from "~/models/Book.model";
+import { useCartStore } from "../../stores/cartStore";
 
 interface BookCardProps {
   book: Book;
   onAddToCart?: (book: Book) => void;
+  isDisplayAddToCart?: boolean;
 }
 
-export const BookCard: React.FC<BookCardProps> = ({ book, onAddToCart }) => {
-  const { addToCart } = useCart();
+export const BookCard: React.FC<BookCardProps> = ({
+  book,
+  onAddToCart,
+  isDisplayAddToCart,
+}) => {
+  const addToCart = useCartStore((state) => state.addToCart);
 
   const handleAddToCart = () => {
     addToCart(book, 1);
+    console.log(`Added ${book.title} to cart`);
     onAddToCart?.(book);
   };
 
@@ -136,15 +142,17 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onAddToCart }) => {
             >
               Xem chi tiết
             </Button>
-            <Button
-              variant="contained"
-              size="small"
-              startIcon={<ShoppingCartIcon />}
-              disabled={book.stock <= 0}
-              onClick={handleAddToCart}
-            >
-              Thêm
-            </Button>
+            {isDisplayAddToCart && (
+              <Button
+                variant="contained"
+                size="small"
+                startIcon={<ShoppingCartIcon />}
+                disabled={book.stock <= 0}
+                onClick={handleAddToCart}
+              >
+                Thêm
+              </Button>
+            )}
           </Box>
         </Box>
       </CardContent>
