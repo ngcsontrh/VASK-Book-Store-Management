@@ -12,7 +12,9 @@ import {
   TableBody,
   TableCell,
   TableContainer,
+  TableFooter,
   TableHead,
+  TablePagination,
   TableRow,
   Typography,
 } from "@mui/material";
@@ -23,91 +25,36 @@ import { useEffect, useState } from "react";
 import type { Order } from "~/models/Order.model";
 import MuiLink from "@mui/material/Link";
 import NextLink from "next/link";
-
-// Mock data cho danh sách đơn hàng
-const mockOrders: Order[] = [
-  {
-    id: "ORD123456789",
-    orderDate: "2025-06-15T08:30:00.000Z",
-    items: [], // Trong danh sách không cần chi tiết các sản phẩm
-    userInfo: {
-      fullName: "Nguyễn Văn A",
-      phone: "0987654321",
-      address: "123 Đường ABC",
-      city: "TP. Hồ Chí Minh",
-      district: "Quận 1",
-      ward: "Phường Bến Nghé",
-    },
-    paymentMethod: "cod",
-    status: "delivered",
-    subtotal: 313000,
-    shippingFee: 30000,
-    total: 343000,
-  },
-  {
-    id: "ORD987654321",
-    orderDate: "2025-06-10T14:45:00.000Z",
-    items: [],
-    userInfo: {
-      fullName: "Nguyễn Văn A",
-      phone: "0987654321",
-      address: "123 Đường ABC",
-      city: "TP. Hồ Chí Minh",
-      district: "Quận 1",
-      ward: "Phường Bến Nghé",
-    },
-    paymentMethod: "bank-transfer",
-    status: "shipped",
-    subtotal: 150000,
-    shippingFee: 30000,
-    total: 180000,
-  },
-  {
-    id: "ORD567891234",
-    orderDate: "2025-06-05T10:15:00.000Z",
-    items: [],
-    userInfo: {
-      fullName: "Nguyễn Văn A",
-      phone: "0987654321",
-      address: "123 Đường ABC",
-      city: "TP. Hồ Chí Minh",
-      district: "Quận 1",
-      ward: "Phường Bến Nghé",
-    },
-    paymentMethod: "momo",
-    status: "processing",
-    subtotal: 225000,
-    shippingFee: 30000,
-    total: 255000,
-  },
-];
+import { useOrderStore } from "~/stores/orderStore";
 
 export default function OrdersContainer() {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const { orders, setOrders } = useOrderStore();
   const [loading, setLoading] = useState(true);
-
-  // Mô phỏng việc lấy danh sách đơn hàng từ API
+  
+  // Pagination states
+  const [page, setPage] = useState(0); // 0-indexed for Material UI pagination
+  const [rowsPerPage, setRowsPerPage] = useState(5); // Number of orders per page
+  
+  // Load orders from store or fetch from backend
   useEffect(() => {
-    const fetchOrders = async () => {
-      setLoading(true);
-      try {
-        // Giả lập API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // Trong thực tế, đây sẽ là một API call
-        // const response = await fetch('/api/orders');
-        // const data = await response.json();
-
-        setOrders(mockOrders);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrders();
+    // Simulate loading from API or check if orders are already loaded
+    setTimeout(() => {
+      // If you need to fetch orders from an API, you would do it here
+      // For now, we'll just use what's in the store
+      setLoading(false);
+    }, 500); // Short delay to show loading state
   }, []);
+  
+  // Handle page change
+  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+    setPage(newPage);
+  };
+  
+  // Handle rows per page change
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setRowsPerPage(Number.parseInt(event.target.value, 10));
+    setPage(0); // Reset to first page when changing rows per page
+  };
 
   // Map status to display color and text
   const getStatusInfo = (status: string) => {
@@ -169,6 +116,7 @@ export default function OrdersContainer() {
             component={Link}
             href="/books"
             variant="contained"
+            size="large"
             sx={{
               mt: 2,
               borderRadius: 2,
@@ -176,6 +124,9 @@ export default function OrdersContainer() {
               "&:hover": {
                 bgcolor: "#1E4C8A",
               },
+              px: 3,
+              py: 1,
+              fontSize: "1rem",
             }}
           >
             Mua sắm ngay
@@ -204,7 +155,7 @@ export default function OrdersContainer() {
           <Box display="flex " alignItems="center">
             <MuiLink
               component={NextLink}
-              href="/orders"
+              href="/cart"
               underline="hover"
               color="inherit"
             >
@@ -214,7 +165,7 @@ export default function OrdersContainer() {
           <Box display="flex " alignItems="center">
             <MuiLink
               component={NextLink}
-              href="/orders"
+              href="/checkout"
               underline="hover"
               color="inherit"
             >
@@ -222,31 +173,28 @@ export default function OrdersContainer() {
             </MuiLink>
           </Box>
           <Box display="flex " alignItems="center">
-            <MuiLink
-              component={NextLink}
-              href="/orders"
-              underline="hover"
-              color="inherit"
-            >
+            <Typography color="text.primary">
               Quản lý đơn hàng
-            </MuiLink>
+            </Typography>
           </Box>
         </Breadcrumbs>
       </Box>
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{ mb: 4 }}>
         <Table>
           <TableHead>
-            <TableRow>
-              <TableCell>Mã đơn hàng</TableCell>
-              <TableCell>Ngày đặt</TableCell>
-              <TableCell align="center">Tổng tiền</TableCell>
-              <TableCell align="center">Trạng thái</TableCell>
-              <TableCell align="center">Chi tiết</TableCell>
+            <TableRow sx={{ bgcolor: '#f5f5f5' }}>
+              <TableCell sx={{ fontWeight: 'bold', fontSize: '1rem' }}>Mã đơn hàng</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', fontSize: '1rem' }}>Ngày đặt</TableCell>
+              <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '1rem' }}>Tổng tiền</TableCell>
+              <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '1rem' }}>Trạng thái</TableCell>
+              <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '1rem' }}>Chi tiết</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {orders.map((order) => {
+            {orders
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((order) => {
               const statusInfo = getStatusInfo(order.status);
               const orderDate = new Date(order.orderDate);
               const formattedDate = format(orderDate, "HH:mm - dd/MM/yyyy", {
@@ -284,8 +232,14 @@ export default function OrdersContainer() {
                       component={Link}
                       href={`/orders/${order.id}`}
                       variant="contained"
-                      size="small"
-                      sx={{ borderRadius: 2 }}
+                      size="medium"
+                      sx={{ 
+                        borderRadius: 2,
+                        px: 2,
+                        py: 0.75,
+                        fontWeight: 500
+                      }}
+                      onClick={() => useOrderStore.getState().setSelectedOrderId(order.id)}
                     >
                       Xem chi tiết
                     </Button>
@@ -294,6 +248,22 @@ export default function OrdersContainer() {
               );
             })}
           </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 20]}
+                count={orders.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                labelRowsPerPage="Hiển thị mỗi trang"
+                labelDisplayedRows={({ from, to, count }) => 
+                  `${from}-${to} trong ${count}`
+                }
+              />
+            </TableRow>
+          </TableFooter>
         </Table>
       </TableContainer>
     </Container>

@@ -10,6 +10,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import OrderIcon from "@mui/icons-material/AssignmentTurnedIn";
 import {
   Box,
   Divider,
@@ -57,12 +58,13 @@ export default function Sidebar() {
 
   const mainMenu = [
     { label: "Trang chủ", path: "/", icon: <HomeIcon /> },
-    { label: "Kho sách", path: "/storage", icon: <MenuBookIcon /> },
+    { label: "Kho sách", path: "#", icon: <MenuBookIcon /> },
     { label: "Giỏ hàng", path: "/cart", icon: <ShoppingCartIcon /> },
-    { label: "Khách hàng", path: "/customers", icon: <PeopleIcon /> },
-    { label: "Báo cáo", path: "/reports", icon: <BarChartIcon /> },
+    { label: "Đơn hàng", path: "/orders", icon: <OrderIcon /> },
+    { label: "Khách hàng", path: "#", icon: <PeopleIcon /> },
+    { label: "Báo cáo", path: "#", icon: <BarChartIcon /> },
     { label: "Hóa đơn", path: "/invoices", icon: <ReceiptIcon /> },
-    { label: "Hỗ trợ", path: "/support", icon: <HelpIcon /> },
+    { label: "Hỗ trợ", path: "#", icon: <HelpIcon /> },
   ];
 
   const bottomMenu = [

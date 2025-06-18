@@ -11,21 +11,13 @@ import {
   TextField,
 } from "@mui/material";
 import { useState } from "react";
-
-interface UserInfo {
-  fullName: string;
-  phone: string;
-  address: string;
-  city: string;
-  district: string;
-  ward: string;
-}
+import type { UserShippingInfo } from "~/models/User.model";
 
 interface UserInfoDialogProps {
   open: boolean;
-  userInfo: UserInfo;
+  userInfo: UserShippingInfo;
   onClose: () => void;
-  onSave: (userInfo: UserInfo) => void;
+  onSave: (userInfo: UserShippingInfo) => void;
 }
 
 export default function UserInfoDialog({
@@ -34,7 +26,7 @@ export default function UserInfoDialog({
   onClose,
   onSave,
 }: UserInfoDialogProps) {
-  const [formData, setFormData] = useState<UserInfo>(userInfo);
+  const [formData, setFormData] = useState<UserShippingInfo>(userInfo);
   const [errors, setErrors] = useState({
     fullName: "",
     phone: "",
@@ -97,7 +89,7 @@ export default function UserInfoDialog({
       fullWidth
       PaperProps={{ elevation: 3, sx: { borderRadius: 2 } }}
     >
-      <DialogTitle>Thông tin người nhận</DialogTitle>
+      <DialogTitle sx={{ typography: 'h5', fontWeight: 600, fontSize: '1.5rem', py: 2 }}>Thông tin người nhận</DialogTitle>
       <DialogContent dividers>
         <Stack spacing={3} sx={{ mt: 1 }}>
           <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
@@ -160,14 +152,31 @@ export default function UserInfoDialog({
         </Stack>
       </DialogContent>
 
-      <DialogActions sx={{ p: 2 }}>
-        <Button onClick={onClose} variant="outlined" sx={{ borderRadius: 2 }}>
+      <DialogActions sx={{ p: 3 }}>
+        <Button 
+          onClick={onClose} 
+          variant="outlined" 
+          size="large"
+          sx={{ 
+            borderRadius: 2,
+            fontSize: '1rem',
+            px: 3,
+            py: 1
+          }}
+        >
           Hủy
         </Button>
         <Button
           onClick={handleSubmit}
           variant="contained"
-          sx={{ borderRadius: 2, bgcolor: "#26599F" }}
+          size="large"
+          sx={{ 
+            borderRadius: 2, 
+            bgcolor: "#26599F", 
+            fontSize: '1rem',
+            px: 3,
+            py: 1
+          }}
         >
           Lưu thông tin
         </Button>

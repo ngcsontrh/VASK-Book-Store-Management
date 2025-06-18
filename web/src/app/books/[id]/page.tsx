@@ -4,7 +4,6 @@ import { Home } from "@mui/icons-material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import {
-  Alert,
   Box,
   Breadcrumbs,
   Button,
@@ -14,7 +13,6 @@ import {
   Container,
   Divider,
   Rating,
-  Snackbar,
   Typography,
 } from "@mui/material";
 import MuiLink from "@mui/material/Link";
@@ -23,6 +21,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { booksData } from "~/models/Book.model";
 import { useCartStore } from "~/stores/cartStore";
+import NotificationModal from "~/components/common/NotificationModal";
 
 export default function BookDetailPage() {
   const params = useParams();
@@ -233,17 +232,13 @@ export default function BookDetailPage() {
         </Box>
       </Box>
 
-      {/* Snackbar thông báo thêm sách vào giỏ hàng */}
-      <Snackbar
+      {/* Modal thông báo thêm sách vào giỏ hàng */}
+      <NotificationModal
         open={isSnackOpen}
-        autoHideDuration={3000}
+        message={snackMessage}
         onClose={handleCloseSnack}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert severity="success" sx={{ width: "100%" }}>
-          {snackMessage}
-        </Alert>
-      </Snackbar>
+        severity="success"
+      />
     </Container>
   );
 }

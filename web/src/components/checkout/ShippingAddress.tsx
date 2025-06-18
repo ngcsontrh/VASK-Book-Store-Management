@@ -4,18 +4,10 @@ import EditIcon from "@mui/icons-material/Edit";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PersonIcon from "@mui/icons-material/Person";
 import { Box, Button, Card, Divider, Stack, Typography } from "@mui/material";
-
-interface UserInfo {
-  fullName: string;
-  phone: string;
-  address: string;
-  city: string;
-  district: string;
-  ward: string;
-}
+import type { UserShippingInfo } from "~/models/User.model";
 
 interface ShippingAddressProps {
-  userInfo: UserInfo;
+  userInfo: UserShippingInfo;
   onEditClick: () => void;
 }
 

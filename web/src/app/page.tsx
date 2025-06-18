@@ -1,3 +1,5 @@
+"use client";
+
 import { Home } from "@mui/icons-material";
 import CategoryIcon from "@mui/icons-material/Category";
 import {
@@ -15,12 +17,30 @@ import {
 } from "@mui/material";
 import NextImage from "next/image";
 import NextLink from "next/link";
+import { useState } from "react";
 import { BookCard } from "../components/books/BookCard";
+import NotificationModal from "../components/common/NotificationModal";
 import { booksData } from "../models/Book.model";
+import type { Book } from "../models/Book.model";
 
 export default function Page() {
   // Get the first 4 books to display
   const featuredBooks = booksData.slice(0, 4);
+  
+  // State for notification
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
+  
+  // Handle adding a book to cart
+  const handleAddToCart = (book: Book) => {
+    setNotificationMessage(`Sách "${book.title}" đã được thêm vào giỏ hàng`);
+    setIsNotificationOpen(true);
+  };
+  
+  // Handle closing the notification
+  const handleCloseNotification = () => {
+    setIsNotificationOpen(false);
+  };
 
   return (
     <>
@@ -95,7 +115,11 @@ export default function Page() {
         >
           {featuredBooks.map((book) => (
             <Box key={book.id}>
-              <BookCard book={book} />
+              <BookCard 
+                book={book} 
+                onAddToCart={handleAddToCart}
+                isDisplayAddToCart={true}
+              />
             </Box>
           ))}
         </Box>
@@ -106,11 +130,26 @@ export default function Page() {
             variant="contained"
             color="primary"
             size="large"
+            sx={{ 
+              borderRadius: 2,
+              px: 4,
+              py: 1,
+              fontSize: '1.1rem',
+              fontWeight: 500
+            }}
           >
             Xem tất cả sách
           </Button>
         </Box>
       </Box>
+      
+      {/* Notification Modal for cart additions */}
+      <NotificationModal
+        open={isNotificationOpen}
+        message={notificationMessage}
+        onClose={handleCloseNotification}
+        severity="success"
+      />
     </>
   );
 }

@@ -48,7 +48,7 @@ export default function CartItemTable({
               <TableCell align="left">Đơn giá</TableCell>
               <TableCell align="right">Số lượng</TableCell>
               <TableCell align="right">Số tiền</TableCell>
-              <TableCell align="right">Thao tác</TableCell>
+              <TableCell align="center">Thao tác</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -87,7 +87,7 @@ export default function CartItemTable({
                 <TableCell align="right">
                   {(item.book.price * item.quantity).toLocaleString()} đ
                 </TableCell>
-                <TableCell align="right">
+                <TableCell align="center">
                   <Button
                     variant="contained"
                     color="error"
@@ -133,7 +133,7 @@ export default function CartItemTable({
               <TableCell align="right">
                 <strong>{getCartTotal().toLocaleString()} đ</strong>
               </TableCell>
-              <TableCell align="right">
+              <TableCell align="center">
                 <Button
                   variant="contained"
                   color="primary"

@@ -6,7 +6,7 @@ import { type CartItem, useCartStore } from "~/stores/cartStore";
 import CartBreadcrumbs from "./CartBreadcrumbs";
 import CartItemTable from "./CartItemTable";
 import DeleteConfirmDialog from "./DeleteConfirmDialog";
-import NotificationSnackbar from "./NotificationSnackbar";
+import NotificationModal from "../common/NotificationModal";
 
 export default function CartContainer() {
   const cartItems = useCartStore((state) => state.cartItems);
@@ -20,7 +20,7 @@ export default function CartContainer() {
   const [openDialog, setOpenDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<CartItem | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [snackServerity, setSnackSeverity] = useState<
+  const [snackSeverity, setSnackSeverity] = useState<
     "success" | "error" | "warning" | "info"
   >("success");
 
@@ -110,11 +110,11 @@ export default function CartContainer() {
         onConfirm={handleConfirmDelete}
       />
 
-      <NotificationSnackbar
+      <NotificationModal
         open={isSnackOpen}
         message={snackMessage}
         onClose={handleCloseSnack}
-        serverity={snackServerity}
+        severity={snackSeverity}
       />
     </Container>
   );

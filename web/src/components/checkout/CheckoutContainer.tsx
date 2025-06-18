@@ -2,9 +2,11 @@
 
 import { Box, Container } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import type { UserShippingInfo } from "~/models/User.model";
 import { useCartStore } from "~/stores/cartStore";
-import NotificationSnackbar from "../cart/NotificationSnackbar";
+import { useOrderStore } from "~/stores/orderStore";
+import NotificationModal from "../common/NotificationModal";
 import CheckoutBreadcrumbs from "./CheckoutBreadcrumbs";
 import CheckoutItemsTable from "./CheckoutItemsTable";
 import CheckoutPayment from "./CheckoutPayment";
@@ -20,6 +22,12 @@ export default function CheckoutContainer() {
   const clearSelectedForCheckout = useCartStore(
     (state) => state.clearSelectedForCheckout,
   );
+  
+  // Flag to prevent warning during successful order redirection
+  const [isOrderSuccessful, setIsOrderSuccessful] = useState(false);
+  
+  // Store redirect URL for navigating to order details after notification
+  const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
 
   // Lọc các mặt hàng đã được chọn để đặt hàng
   const cartItems = allCartItems.filter((item) =>
@@ -27,7 +35,7 @@ export default function CheckoutContainer() {
   );
 
   // Thông tin người dùng
-  const [userInfo, setUserInfo] = useState({
+  const [userInfo, setUserInfo] = useState<UserShippingInfo>({
     fullName: "Nguyễn Văn A",
     phone: "0987654321",
     address: "123 Đường ABC",
@@ -55,6 +63,12 @@ export default function CheckoutContainer() {
   const handleCloseSnack = () => {
     setIsSnackOpen(false);
     setSnackMessage("");
+    
+    // Nếu có URL chuyển hướng đang chờ, thực hiện chuyển hướng ngay khi người dùng đóng thông báo
+    if (redirectUrl) {
+      router.push(redirectUrl);
+      setRedirectUrl(null); // Reset redirectUrl sau khi đã điều hướng
+    }
   };
 
   const handleOpenUserInfoDialog = () => {
@@ -65,71 +79,120 @@ export default function CheckoutContainer() {
     setUserInfoDialogOpen(false);
   };
 
-  const handleSaveUserInfo = (newUserInfo: typeof userInfo) => {
+  const handleSaveUserInfo = (newUserInfo: UserShippingInfo) => {
     setUserInfo(newUserInfo);
     setUserInfoDialogOpen(false);
   };
+  // Lấy phương thức thêm đơn hàng từ orderStore
+  const { addOrder, setSelectedOrderId } = useOrderStore();
+
   const handlePlaceOrder = async () => {
     setLoading(true);
 
     // Mô phỏng gửi đơn hàng lên server
     try {
+      // Tính tổng tiền hàng
+      const subtotal = cartItems.reduce(
+        (total, item) => total + item.book.price * item.quantity,
+        0
+      );
+      
+      // Giả sử phí vận chuyển là 30.000đ
+      const shippingFee = 30000;
+      
       // Tạo đối tượng đơn hàng với thông tin đầy đủ
-      const orderData = {
-        items: cartItems,
+      const orderId = `ORD${Date.now().toString().slice(-10)}`;
+      const order = {
+        id: orderId,
+        items: cartItems.map(item => ({
+          book: item.book,
+          quantity: item.quantity,
+          price: item.book.price
+        })),
         userInfo,
         paymentMethod,
-        total:
-          cartItems.reduce(
-            (total, item) => total + item.book.price * item.quantity,
-            0,
-          ) + 30000, // tạm tính + phí ship
+        status: "pending" as const, // Trạng thái ban đầu: đang chờ xử lý (as const để TypeScript biết đây là literal type)
+        subtotal,
+        shippingFee,
+        total: subtotal + shippingFee,
         orderDate: new Date().toISOString(),
       };
 
-      console.log("Placing order:", orderData);
+      console.log("Placing order:", order);
+      
+      // Đánh dấu đơn hàng thành công để tránh hiển thị cảnh báo
+      setIsOrderSuccessful(true);
+      
+      // Lưu đơn hàng vào orderStore
+      addOrder(order);
+      setSelectedOrderId(orderId);
 
-      // Giả lập API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Xóa các sản phẩm đã đặt khỏi giỏ hàng
+      // Xóa các sản phẩm khỏi giỏ hàng
       for (const id of selectedIds) {
         removeFromCart(id);
       }
-
+      
       // Xóa danh sách sản phẩm được chọn để đặt hàng
       clearSelectedForCheckout();
 
-      // Thông báo đặt hàng thành công
+      // Thông báo đặt hàng thành công và đợi hiển thị xong mới chuyển trang
       setIsSnackOpen(true);
       setSnackMessage(
         "Đặt hàng thành công! Cảm ơn bạn đã sử dụng dịch vụ của VASK Book Store.",
       );
       setSnackSeverity("success");
-
-      // Chuyển hướng về trang chủ sau 2 giây
+      
+      // Lưu URL để chuyển hướng sau khi hiển thị thông báo
+      const orderDetailsUrl = `/orders/${orderId}`;
+      setRedirectUrl(orderDetailsUrl);
+      
+      // Đợi modal hiển thị đủ thời gian trước khi chuyển trang
+      // Sử dụng thời gian 3000ms (3 giây) - thời gian mặc định của autoHideDuration
       setTimeout(() => {
-        router.push("/");
-      }, 2000);
+        // Chỉ chuyển hướng nếu redirectUrl vẫn còn (người dùng không tắt notification)
+        if (redirectUrl === orderDetailsUrl) {
+          // Chuyển hướng đến trang chi tiết đơn hàng sau khi hiển thị thông báo
+          router.push(orderDetailsUrl);
+          // Reset redirectUrl sau khi đã điều hướng
+          setRedirectUrl(null);
+        }
+      }, 3000);
     } catch (error) {
       setIsSnackOpen(true);
       setSnackMessage("Đã xảy ra lỗi khi đặt hàng. Vui lòng thử lại sau.");
       setSnackSeverity("error");
+      // Reset success flag on error
+      setIsOrderSuccessful(false);
     } finally {
       setLoading(false);
     }
   };
 
-  // Chuyển hướng người dùng nếu không có sản phẩm được chọn để đặt hàng
-  if (cartItems.length === 0) {
+  // Reset isOrderSuccessful flag if it was previously set
+  // This prevents the flag from persisting across navigations
+  useEffect(() => {
+    if (cartItems.length > 0 && isOrderSuccessful) {
+      setIsOrderSuccessful(false);
+    }
+  }, [cartItems.length, isOrderSuccessful]);
+
+  // Clear redirect state when component unmounts
+  useEffect(() => {
+    return () => {
+      setRedirectUrl(null);
+    };
+  }, []);
+
+  // Chuyển hướng người dùng nếu không có sản phẩm được chọn để đặt hàng và không phải đang trong quá trình đặt hàng thành công
+  if (cartItems.length === 0 && !isOrderSuccessful) {
     return (
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <CheckoutBreadcrumbs />
-        <NotificationSnackbar
+        <NotificationModal
           open={true}
           message="Không có sản phẩm nào được chọn để đặt hàng. Vui lòng quay lại giỏ hàng và chọn sản phẩm."
-          onClose={() => {}}
-          serverity="warning"
+          onClose={() => router.push("/cart")}
+          severity="warning"
         />
       </Container>
     );
@@ -192,11 +255,11 @@ export default function CheckoutContainer() {
         onSave={handleSaveUserInfo}
       />
 
-      <NotificationSnackbar
+      <NotificationModal
         open={isSnackOpen}
         message={snackMessage}
         onClose={handleCloseSnack}
-        serverity={snackSeverity}
+        severity={snackSeverity}
       />
     </Container>
   );

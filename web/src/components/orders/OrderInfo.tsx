@@ -6,16 +6,32 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PaymentIcon from "@mui/icons-material/Payment";
 import PersonIcon from "@mui/icons-material/Person";
 import LocalAtmIcon from "@mui/icons-material/LocalAtm";
-import { Box, Card, Chip, Divider, Stack, Typography } from "@mui/material";
+import { 
+  Box, 
+  Card, 
+  Chip, 
+  Divider, 
+  Stack, 
+  Typography,
+  Button,
+  Menu,
+  MenuItem
+} from "@mui/material";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import type { Order } from "~/models/Order.model";
+import { useOrderStore } from "~/stores/orderStore";
+import { useState } from "react";
 
 interface OrderInfoProps {
   order: Order;
 }
 
 export default function OrderInfo({ order }: OrderInfoProps) {
+  const { updateOrder } = useOrderStore();
+  const [statusAnchorEl, setStatusAnchorEl] = useState<null | HTMLElement>(null);
+  const statusMenuOpen = Boolean(statusAnchorEl);
+
   const {
     id,
     orderDate,
@@ -28,6 +44,19 @@ export default function OrderInfo({ order }: OrderInfoProps) {
   } = order;
 
   const { fullName, phone, address, city, district, ward } = userInfo;
+  
+  const handleStatusClick = (event: React.MouseEvent<HTMLElement>) => {
+    setStatusAnchorEl(event.currentTarget);
+  };
+
+  const handleStatusClose = () => {
+    setStatusAnchorEl(null);
+  };
+
+  const handleStatusChange = (newStatus: "pending" | "processing" | "shipped" | "delivered" | "cancelled") => {
+    updateOrder(id, { status: newStatus });
+    handleStatusClose();
+  };
 
   // Map paymentMethod to display text
   const getPaymentMethodText = () => {
@@ -85,12 +114,26 @@ export default function OrderInfo({ order }: OrderInfoProps) {
             <Typography component="span" variant="h6" fontWeight="bold">
               Chi tiết đơn hàng
             </Typography>
-          </Typography>{" "}
-          <Chip
-            label={statusInfo.text}
-            color={statusInfo.color}
-            sx={{ borderRadius: 1, fontWeight: 500 }}
-          />
+          </Typography>
+          <Box>
+            <Chip
+              label={statusInfo.text}
+              color={statusInfo.color}
+              onClick={handleStatusClick}
+              sx={{ borderRadius: 1, fontWeight: 500, cursor: 'pointer' }}
+            />
+            <Menu
+              anchorEl={statusAnchorEl}
+              open={statusMenuOpen}
+              onClose={handleStatusClose}
+            >
+              <MenuItem onClick={() => handleStatusChange("pending")}>Chờ xác nhận</MenuItem>
+              <MenuItem onClick={() => handleStatusChange("processing")}>Đang xử lý</MenuItem>
+              <MenuItem onClick={() => handleStatusChange("shipped")}>Đang giao hàng</MenuItem>
+              <MenuItem onClick={() => handleStatusChange("delivered")}>Đã giao hàng</MenuItem>
+              <MenuItem onClick={() => handleStatusChange("cancelled")}>Đã hủy</MenuItem>
+            </Menu>
+          </Box>
         </Stack>
       </Box>
 

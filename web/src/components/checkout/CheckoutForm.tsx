@@ -17,10 +17,20 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import type { Order } from "~/models/Order.model";
+import type { UserShippingInfo } from "~/models/User.model";
 import { useCartStore } from "~/stores/cartStore";
+import { useOrderStore } from "~/stores/orderStore";
 
 interface CheckoutFormProps {
   onOrderComplete: (success: boolean) => void;
+}
+
+// Combine UserShippingInfo with additional checkout form fields
+interface CheckoutFormData extends UserShippingInfo {
+  email: string;
+  paymentMethod: string;
+  notes: string;
 }
 
 export default function CheckoutForm({ onOrderComplete }: CheckoutFormProps) {
@@ -32,21 +42,23 @@ export default function CheckoutForm({ onOrderComplete }: CheckoutFormProps) {
   const selectedIds = useCartStore((state) => state.selectedForCheckout);
   const removeFromCart = useCartStore((state) => state.removeFromCart);
 
-  // Form state
-  const [formData, setFormData] = useState({
+  // Form state with properly typed interface
+  const [formData, setFormData] = useState<CheckoutFormData>({
+    // UserShippingInfo fields
     fullName: "",
-    email: "",
     phone: "",
     address: "",
     city: "",
     district: "",
     ward: "",
+    // Additional fields
+    email: "",
     paymentMethod: "cod",
     notes: "",
   });
 
-  // Validation errors
-  const [errors, setErrors] = useState({
+  // Validation errors with proper typing
+  const [errors, setErrors] = useState<Record<keyof Omit<CheckoutFormData, 'city' | 'district' | 'ward' | 'notes' | 'paymentMethod'>, string>>({
     fullName: "",
     email: "",
     phone: "",
@@ -61,7 +73,7 @@ export default function CheckoutForm({ onOrderComplete }: CheckoutFormProps) {
     });
 
     // Clear error when user types
-    if (errors[name as keyof typeof errors]) {
+    if (name in errors) {
       setErrors({
         ...errors,
         [name]: "",
@@ -103,6 +115,11 @@ export default function CheckoutForm({ onOrderComplete }: CheckoutFormProps) {
     return valid;
   };
 
+  const { addOrder, setSelectedOrderId } = useOrderStore();
+  const cartItems = useCartStore(state => state.cartItems.filter(item => 
+    selectedIds.includes(item.book.id)
+  ));
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -112,10 +129,46 @@ export default function CheckoutForm({ onOrderComplete }: CheckoutFormProps) {
 
     setLoading(true);
 
-    // Mô phỏng gửi đơn hàng lên server
     try {
-      // Giả lập API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Tính tổng tiền hàng
+      const subtotal = cartItems.reduce(
+        (total, item) => total + item.book.price * item.quantity,
+        0
+      );
+      
+      // Giả sử phí vận chuyển là 30.000đ
+      const shippingFee = 30000;
+      
+      // Tạo đối tượng đơn hàng với thông tin đầy đủ theo interface Order
+      const orderId = `ORD${Date.now().toString().slice(-10)}`;
+      
+      // Tạo đối tượng order với kiểu Order
+      const order: Order = {
+        id: orderId,
+        orderDate: new Date().toISOString(),
+        items: cartItems.map(item => ({
+          book: item.book,
+          quantity: item.quantity,
+          price: item.book.price
+        })),
+        userInfo: {
+          fullName: formData.fullName,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          district: formData.district,
+          ward: formData.ward,
+        },
+        paymentMethod: formData.paymentMethod,
+        status: "pending",
+        subtotal,
+        shippingFee,
+        total: subtotal + shippingFee,
+      };
+      
+      // Lưu đơn hàng vào orderStore
+      addOrder(order);
+      setSelectedOrderId(orderId);
 
       // Xóa các sản phẩm đã đặt khỏi giỏ hàng
       for (const id of selectedIds) {
@@ -128,10 +181,8 @@ export default function CheckoutForm({ onOrderComplete }: CheckoutFormProps) {
       // Thông báo đặt hàng thành công
       onOrderComplete(true);
 
-      // Chuyển hướng về trang chủ sau 2 giây
-      setTimeout(() => {
-        router.push("/");
-      }, 2000);
+      // Chuyển hướng đến trang chi tiết đơn hàng
+      router.push(`/orders/${orderId}`);
     } catch (error) {
       onOrderComplete(false);
     } finally {

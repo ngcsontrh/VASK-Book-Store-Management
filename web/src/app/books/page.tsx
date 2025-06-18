@@ -2,27 +2,21 @@
 
 import { Home } from "@mui/icons-material";
 import {
-  Alert,
   Box,
   Breadcrumbs,
   Container,
   Pagination,
   Paper,
-  Snackbar,
   Typography,
 } from "@mui/material";
 import MuiLink from "@mui/material/Link";
+import type { Metadata } from "next";
 import NextLink from "next/link";
 import { useState } from "react";
 import { BookCard } from "~/components/books/BookCard";
 import { BookFilter } from "~/components/books/BookFilter";
+import NotificationModal from "~/components/common/NotificationModal";
 import { type Book, booksData } from "~/models/Book.model";
-
-export const Metadata = {
-  title: "Danh sách sách | VASK Book Store",
-  description:
-    "Khám phá bộ sưu tập sách đa dạng tại VASK Book Store, nơi bạn có thể tìm thấy những cuốn sách yêu thích nhất.",
-};
 
 export default function BooksPage() {
   const [filteredBooks, setFilteredBooks] = useState(booksData);
@@ -168,18 +162,13 @@ export default function BooksPage() {
         )}
       </Box>
 
-      {/* Snackbar thông báo thêm sách vào giỏ hàng */}
-      <Snackbar
+      {/* Modal thông báo thêm sách vào giỏ hàng */}
+      <NotificationModal
         open={isSnackOpen}
-        autoHideDuration={3000}
+        message={snackMessage}
         onClose={handleCloseSnack}
-        message="Sách đã được thêm vào giỏ hàng"
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert severity="success" sx={{ width: "100%" }}>
-          {snackMessage}
-        </Alert>
-      </Snackbar>
+        severity="success"
+      />
 
       {/* Phân trang */}
       {filteredBooks.length > 0 && (

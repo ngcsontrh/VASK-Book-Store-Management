@@ -4,12 +4,19 @@ import { Home } from "@mui/icons-material";
 import { Box, Breadcrumbs } from "@mui/material";
 import MuiLink from "@mui/material/Link";
 import NextLink from "next/link";
+import { useOrderStore } from "~/stores/orderStore";
+import { useEffect } from "react";
 
 interface OrderBreadcrumbsProps {
   orderId: string;
 }
 
 export default function OrderBreadcrumbs({ orderId }: OrderBreadcrumbsProps) {
+  const { setSelectedOrderId } = useOrderStore();
+  
+  useEffect(() => {
+    setSelectedOrderId(orderId);
+  }, [orderId, setSelectedOrderId]);
   return (
     <Box
       sx={{

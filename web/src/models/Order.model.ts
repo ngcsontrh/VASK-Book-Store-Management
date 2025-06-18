@@ -1,4 +1,5 @@
 import type { Book } from "./Book.model";
+import type { UserShippingInfo } from "./User.model";
 
 export interface OrderItem {
   book: Book;
@@ -6,20 +7,11 @@ export interface OrderItem {
   price: number; // Giá tại thời điểm đặt hàng
 }
 
-export interface UserInfo {
-  fullName: string;
-  phone: string;
-  address: string;
-  city: string;
-  district: string;
-  ward: string;
-}
-
 export interface Order {
   id: string;
   orderDate: string;
   items: OrderItem[];
-  userInfo: UserInfo;
+  userInfo: UserShippingInfo;
   paymentMethod: string;
   status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
   subtotal: number;

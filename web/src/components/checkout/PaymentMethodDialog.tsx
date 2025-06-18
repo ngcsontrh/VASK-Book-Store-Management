@@ -48,7 +48,7 @@ export default function PaymentMethodDialog({
       fullWidth
       PaperProps={{ elevation: 3, sx: { borderRadius: 2 } }}
     >
-      <DialogTitle>Chọn phương thức thanh toán</DialogTitle>
+      <DialogTitle sx={{ typography: 'h5', fontWeight: 600, fontSize: '1.5rem', py: 2 }}>Chọn phương thức thanh toán</DialogTitle>
 
       <DialogContent dividers>
         <FormControl component="fieldset" fullWidth>
@@ -146,14 +146,31 @@ export default function PaymentMethodDialog({
         </FormControl>
       </DialogContent>
 
-      <DialogActions sx={{ p: 2 }}>
-        <Button onClick={onClose} variant="outlined" sx={{ borderRadius: 2 }}>
+      <DialogActions sx={{ p: 3 }}>
+        <Button 
+          onClick={onClose} 
+          variant="outlined" 
+          size="large"
+          sx={{ 
+            borderRadius: 2,
+            fontSize: '1rem',
+            px: 3,
+            py: 1
+          }}
+        >
           Hủy
         </Button>
         <Button
           onClick={handleSave}
           variant="contained"
-          sx={{ borderRadius: 2, bgcolor: "#26599F" }}
+          size="large"
+          sx={{ 
+            borderRadius: 2, 
+            bgcolor: "#26599F",
+            fontSize: '1rem',
+            px: 3,
+            py: 1
+          }}
         >
           Xác nhận
         </Button>

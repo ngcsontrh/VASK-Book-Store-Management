@@ -13,14 +13,21 @@ import {
   Typography,
 } from "@mui/material";
 import type { OrderItem } from "~/models/Order.model";
+import { useOrderStore } from "~/stores/orderStore";
 
 interface OrderItemsTableProps {
   items: OrderItem[];
 }
 
 export default function OrderItemsTable({ items }: OrderItemsTableProps) {
+  const { selectedOrderId, orders } = useOrderStore();
+  
+  // Lấy thông tin đơn hàng từ orderStore nếu có
+  const order = selectedOrderId ? orders.find(o => o.id === selectedOrderId) : null;
+  const orderItems = order ? order.items : items;
+  
   // Tính tổng thành tiền
-  const total = items.reduce(
+  const total = orderItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0,
   );
@@ -45,7 +52,7 @@ export default function OrderItemsTable({ items }: OrderItemsTableProps) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {items.map((item) => (
+            {orderItems.map((item) => (
               <TableRow key={item.book.id} hover>
                 <TableCell align="left">
                   <img
